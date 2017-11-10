@@ -5,6 +5,7 @@ using UnityEditor;
 using System.Linq;
 using System;
 using UnityEditor.IMGUI.Controls;
+using BetterHandles;
 
 public class HandlesExampleWindow : EditorWindow
 {
@@ -13,9 +14,10 @@ public class HandlesExampleWindow : EditorWindow
 	[SerializeField]
 	string			currentKey = null;
 
-	static float	angle = 42, radius = 2, capsRadius = .5f, height = 2;
-	static Vector3	boxSize = new Vector3(2, 1, 2);
-	static Vector3	minAngles = new Vector3(0, 0, 0), maxAngles = new Vector3(45, 45, 45);
+	static float			angle = 42, radius = 2, capsRadius = .5f, height = 2;
+	static Vector3			boxSize = new Vector3(2, 1, 2);
+	static Vector3			minAngles = new Vector3(0, 0, 0), maxAngles = new Vector3(45, 45, 45);
+	static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1), new Keyframe(.5f, .7f), new Keyframe(1, 0));
 
 	Dictionary< string, Action >	handlesActions = new Dictionary< string, Action >()
 	{
@@ -29,6 +31,7 @@ public class HandlesExampleWindow : EditorWindow
 		{"Solid scaled rectangle", () => HandlesExtended.DrawRectange(Vector3.zero, Quaternion.Euler(90, 0, 90), new Vector3(1, 3, 2), new Color(0, 0, 1, 1f))},
 		{"Solid scaled sphere", () => HandlesExtended.DrawSphere(Vector3.zero, Quaternion.Euler(90, 0, 90), new Vector3(1, 3, 2), new Color(0, 0, 1, .3f))},
 		{"Full custom Handles", null},
+		{"Curve Handle", () => HandlesExtended.CurveHandle(3, 2, curve, Quaternion.identity, new Color(1, 0, 0, .3f), new Color(0, 0, 1, .3f))},
 		{"IMGUI Handles", null},
 		{"Arc Handle", () => HandlesExtended.ArcHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref angle, ref radius, new Color(1, 0, 0, .1f), new Color(0, 0, 1, 1f))},
 		{"Box Bounds Handle", () => HandlesExtended.BoxBoundsHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref boxSize, PrimitiveBoundsHandle.Axes.All, new Color(1, 0, 0, 1f), new Color(0, 0, 1, 1f))},
@@ -88,6 +91,7 @@ public class HandlesExampleWindow : EditorWindow
 	void OnSceneGUI(SceneView sv)
 	{
 		//draw the current shown handles
+		Debug.Log("evt: " + Event.current.type);
 		handlesActions[currentKey]();
 
 		if (focus)

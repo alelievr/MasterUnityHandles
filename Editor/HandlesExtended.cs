@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using BetterHandles;
 
 public static class HandlesExtended
 {
@@ -130,6 +131,7 @@ public static class HandlesExtended
 		using (new Handles.DrawingScope(trs))
 		{
 			capsuleBoundsHandle.heightAxis = heightAxis;
+			capsuleBoundsHandle.axes = handleAxes;
 			capsuleBoundsHandle.radius = radius;
 			capsuleBoundsHandle.height = height;
 			capsuleBoundsHandle.handleColor = handleColor;
@@ -191,11 +193,15 @@ public static class HandlesExtended
 
 	#endregion
 
-	#region Full custom Handles
+	#region Full custom handles (sources included)
 
-	public static void CurveHandle(Vector3 startPoint, Vector3 EndPoint, Gradient curveGradient, float yScale = 1)
+	static CurveHandle	curveHandle = new CurveHandle();
+
+	public static void CurveHandle(float width, float height, AnimationCurve curve, Quaternion rotation, Color startColor, Color endColor)
 	{
-		
+		curveHandle.SetColors(startColor, endColor);
+		curveHandle.Set2DSize(width, height);
+		curveHandle.DrawHandle(curve);
 	}
 
 	#endregion
