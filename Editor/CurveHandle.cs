@@ -13,14 +13,13 @@ namespace BetterHandles
 
 		public int		curveSamples = 50;
 
-		public void		DrawHandle(AnimationCurve curve)
+		KeyframeHandle	keyframeHandle = new KeyframeHandle();
+
+		Vector3 pos = Vector3.zero;
+		public void		DrawHandle(AnimationCurve curve, bool editableSize = false)
 		{
-			switch (Event.current.type)
+			switch (e.type)
 			{
-				case EventType.MouseDown:
-					break ;
-				case EventType.MouseUp:
-					break ;
 				case EventType.Repaint:
 					PushGLContext();
 					DrawBorders();
@@ -29,6 +28,12 @@ namespace BetterHandles
 					PopGLContext();
 					break ;
 			}
+
+			//draw curve handles:
+			DrawCurvePointsHandle(curve);
+		
+			if (editableSize)
+				DrawZoneHandles();
 		}
 
 		void PushGLContext()
@@ -86,18 +91,18 @@ namespace BetterHandles
 			Handles.Label(Vector3.zero, "0");
 		}
 
-		void DrawCurvePointHandle(AnimationCurve curve, int index)
+		void DrawCurvePointsHandle(AnimationCurve curve)
 		{
-			Keyframe kf = curve.keys[index];
+			keyframeHandle.SetTransform(this);
 
-			Vector3 pos = new Vector3(kf.time * width, kf.value * height, 0);
+			for (int i = 0; i < curve.length; i++)
+			{
+				Keyframe kf = curve.keys[i];
 
-			pos = Handles.FreeMoveHandle(pos, Quaternion.identity, .05f, Vector3.zero, Handles.DotHandleCap);
-			Debug.Log("pos: " + pos);
+				keyframeHandle.DrawHandle(new Vector2(width, height), ref kf);
 
-			kf.time = pos.x / width;
-			kf.value = pos.y / height;
-			curve.keys[index] = kf;
+				curve.MoveKey(i, kf);
+			}
 		}
 
 		void DrawCurve(AnimationCurve curve)
@@ -118,13 +123,14 @@ namespace BetterHandles
 				}
 			}
 			GL.End();
-
-			//draw curve handles:
-			for (int i = 0; i < curve.length; i++)
-				DrawCurvePointHandle(curve, i);
 		}
 
-		public void		SetColors(Color startColor, Color endColor)
+		void DrawZoneHandles()
+		{
+
+		}
+
+		public void	SetColors(Color startColor, Color endColor)
 		{
 			curveGradient = new Gradient();
 			GradientColorKey[]	colorKeys = new GradientColorKey[2]{new GradientColorKey(startColor, 0), new GradientColorKey(endColor, 1)};

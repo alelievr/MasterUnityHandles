@@ -6,17 +6,35 @@ namespace BetterHandles
 {
 	public class CustomHandle
 	{
-		public Quaternion	rotation = Quaternion.identity;
-		public Vector3		scale = Vector3.one;
-		public Vector3		position;
+		Quaternion			rotation = Quaternion.identity;
+		Vector3				scale = Vector3.one;
+		Vector3				position;
 
-		public Matrix4x4	matrix { get { return Matrix4x4.TRS(position, rotation, scale); } }
+		public Matrix4x4	matrix = Matrix4x4.identity;
+		public Event		e { get { return Event.current; } }
 
 		public void SetTransform(Transform transform)
 		{
 			rotation = transform.rotation;
 			position = transform.position;
 			scale = transform.localScale;
+			matrix = Matrix4x4.TRS(position, rotation, scale);
+		}
+		
+		public void SetTransform(Vector3 position, Quaternion rotation, Vector3 scale)
+		{
+			this.rotation = rotation;
+			this.position = position;
+			this.scale = scale;
+			matrix = Matrix4x4.TRS(position, rotation, scale);
+		}
+		
+		public void SetTransform(CustomHandle handle)
+		{
+			this.rotation = handle.rotation;
+			this.position = handle.position;
+			this.scale = handle.scale;
+			matrix = Matrix4x4.TRS(position, rotation, scale);
 		}
 	}
 }
