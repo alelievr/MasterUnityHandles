@@ -195,13 +195,22 @@ public static class HandlesExtended
 
 	#region Full custom handles (sources included)
 
-	static CurveHandle	curveHandle = new CurveHandle();
+	static CurveHandle		curveHandle = new CurveHandle();
+	static KeyframeHandle	keyframeHandle = new KeyframeHandle();
 
 	public static void CurveHandle(float width, float height, AnimationCurve curve, Quaternion rotation, Color startColor, Color endColor)
 	{
 		curveHandle.SetColors(startColor, endColor);
 		curveHandle.Set2DSize(width, height);
 		curveHandle.DrawHandle(curve);
+	}
+
+	public static void KeyframeHandle(float width, float height, ref Keyframe keyframe, Color pointColor, Color tangentColor)
+	{
+		keyframeHandle.pointColor = pointColor;
+		keyframeHandle.tangentColor = tangentColor;
+
+		keyframeHandle.DrawHandle(new Vector2(width, height), ref keyframe, .03f);
 	}
 
 	#endregion

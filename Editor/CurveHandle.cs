@@ -15,7 +15,6 @@ namespace BetterHandles
 
 		KeyframeHandle	keyframeHandle = new KeyframeHandle();
 
-		Vector3 pos = Vector3.zero;
 		public void		DrawHandle(AnimationCurve curve, bool editableSize = false)
 		{
 			switch (e.type)
@@ -99,7 +98,7 @@ namespace BetterHandles
 			{
 				Keyframe kf = curve.keys[i];
 
-				keyframeHandle.DrawHandle(new Vector2(width, height), ref kf);
+				keyframeHandle.DrawHandle(new Vector2(width, height), ref kf, .03f);
 
 				curve.MoveKey(i, kf);
 			}

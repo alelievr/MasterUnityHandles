@@ -17,8 +17,8 @@ public class HandlesExampleWindow : EditorWindow
 	static float			angle = 42, radius = 2, capsRadius = .5f, height = 2;
 	static Vector3			boxSize = new Vector3(2, 1, 2);
 	static Vector3			minAngles = new Vector3(0, 0, 0), maxAngles = new Vector3(45, 45, 45);
-	// static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1), new Keyframe(.5f, .7f), new Keyframe(1, 0));
-	static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1));
+	static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1), new Keyframe(.5f, .7f), new Keyframe(1, 0));
+	// static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1));
 
 	Dictionary< string, Action >	handlesActions = new Dictionary< string, Action >()
 	{
@@ -85,6 +85,17 @@ public class HandlesExampleWindow : EditorWindow
 					}
 				}
 				EditorGUILayout.EndHorizontal();
+			}
+		}
+		EditorGUILayout.EndVertical();
+
+		EditorGUILayout.BeginVertical(new GUIStyle("box"));
+		{
+			EditorGUILayout.CurveField(curve);
+			for (int i = 0; i < curve.length; i++)
+			{
+				var key = curve.keys[i];
+				Debug.Log("key[" + i + "]: " + key.inTangent + ", " + key.outTangent);
 			}
 		}
 		EditorGUILayout.EndVertical();

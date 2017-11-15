@@ -5,16 +5,19 @@ using UnityEditor;
 
 public static class CustomHandleUtility
 {
-	public static Vector3	GetPointOnPlane(Matrix4x4 planeTransform, Ray ray)
+	public static bool	GetPointOnPlane(Matrix4x4 planeTransform, Ray ray, out Vector3 position)
 	{
 		float	dist;
-		Vector3	ret;
+		position = Vector3.zero;
 		Plane	p = new Plane(planeTransform * Vector3.forward, planeTransform * Vector3.zero);
 
 		p.Raycast(ray, out dist);
 
-		ret = ray.GetPoint(dist);
+		if (dist < 0)
+			return false;
+
+		position = ray.GetPoint(dist);
 		
-		return ret;
+		return true;
 	}
 }

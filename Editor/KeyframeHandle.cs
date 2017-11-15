@@ -7,53 +7,100 @@ namespace BetterHandles
 {
 	public class KeyframeHandle : CustomHandle
 	{
-		int	keyframeHandleHash = "KeyframeHandle".GetHashCode();
-		Free2DMoveHandle	free2DMoveHandle = new Free2DMoveHandle();
+		public Color		pointColor;
+		public Color		tangentColor;
+		public Color		wireColor = Color.green;
+		public float		tangentHandleSpacing = .3f;
+		public float		tangentHandleScale = .75f;
 
-		public void DrawHandle(Vector2 zone, ref Keyframe keyframe)
+		const float			piOf2 = (Mathf.PI / 2f);
+
+		Free2DMoveHandle	pointHandle = new Free2DMoveHandle();
+		Free2DMoveHandle	tangentHandle = new Free2DMoveHandle();
+
+		public void DrawHandle(Vector2 zone, ref Keyframe keyframe, float size)
 		{
-			int	controlId = EditorGUIUtility.GetControlID(keyframeHandleHash, FocusType.Passive);
-
 			switch (e.type)
 			{
 				case EventType.MouseDown:
-					if (HandleUtility.nearestControl == controlId && e.button == 1)
-					{
-						Debug.Log("Context click !");
+					//we add the context menu when right clicking on the point Handle:
+					if (HandleUtility.nearestControl == pointHandle.controlId && e.button == 1)
 						KeyframeContextMenu();
-					}
-					break ;
-				case EventType.Layout:
-					//TODO: raycast and 2D distance
-					HandleUtility.AddControl(controlId, 100000f);
 					break ;
 			}
 
-			DrawKeyframeHandle(zone, keyframe);
+			DrawKeyframeHandle(zone, ref keyframe, size);
 		}
 
-		void DrawKeyframeHandle(Vector2 zone, Keyframe keyframe)
+		Vector2 TangentToDirection(float radTangent)
 		{
-			free2DMoveHandle.SetTransform(this);
+			if (float.IsInfinity(radTangent))
+				return new Vector2(0, -1);
+			return (new Vector2(1f, radTangent)).normalized * tangentHandleSpacing;
+		}
 
-			//global position
+		float DirectionToTangent(Vector2 direction)
+		{
+			return direction.y / direction.x;
+		}
+
+		void DrawKeyframeHandle(Vector2 zone, ref Keyframe keyframe, float size)
+		{
+			pointHandle.SetTransform(this);
+			tangentHandle.SetTransform(this);
+
+			//point position
 			Vector2 keyframePosition = new Vector2(zone.x * keyframe.time, zone.y * keyframe.value);
-			free2DMoveHandle.DrawHandle(ref keyframePosition, 1f);
 
-			//tangents:
+			//tangent positions:
+			Vector2 tangent1Position = TangentToDirection(keyframe.inTangent);
+			Vector2 tangent2Position = TangentToDirection(keyframe.outTangent);
 
+			//tangent Wires:
+			HandlesMaterials.vertexColor.SetPass(0);
+			GL.Begin(GL.LINES);
+			{
+				GL.Color(wireColor);
+				GL.Vertex(matrix.MultiplyPoint(keyframePosition));
+				GL.Vertex(matrix.MultiplyPoint(tangent1Position + keyframePosition));
+				GL.Vertex(matrix.MultiplyPoint(keyframePosition));
+				GL.Vertex(matrix.MultiplyPoint(tangent2Position + keyframePosition));
+			}
+			GL.End();
+			
+			//draw main point Handle
+			pointHandle.DrawHandle(ref keyframePosition, size);
+
+			//draw tangents Handles
+			tangent1Position += keyframePosition;
+			tangent2Position += keyframePosition;
+			tangentHandle.DrawHandle(ref tangent1Position, size * tangentHandleScale);
+			tangentHandle.DrawHandle(ref tangent2Position, size * tangentHandleScale);
+
+			Vector2 d1 = tangent1Position - keyframePosition;
+			Vector2 d2 = tangent2Position - keyframePosition;
+
+			/*if (d1.x < -0.0001f)
+				keyframe.inTangent = d1.y / d1.x;
+			else
+				keyframe.inTangent = float.PositiveInfinity;
+
+			if (d2.x > 0.0001f)
+				keyframe.outTangent = d2.y / d2.x;
+			else
+				keyframe.outTangent = float.PositiveInfinity;*/
+
+			keyframe.inTangent = DirectionToTangent(tangent1Position - keyframePosition);
+			keyframe.outTangent = DirectionToTangent(tangent2Position - keyframePosition);
+
+			Handles.Label(tangent1Position, (DirectionToTangent(tangent1Position - keyframePosition)) + "");
+			Handles.Label(tangent2Position, (DirectionToTangent(tangent2Position - keyframePosition)) + "");
+
+			//set modified keyframe values
+			// keyframe.inTangent = DirectionToRadiant(tangent1Position - keyframePosition) + piOf2;
+			// keyframe.outTangent = DirectionToRadiant(tangent2Position - keyframePosition) - piOf2;
 			keyframe.time = keyframePosition.x / zone.x;
 			keyframe.value = keyframePosition.y / zone.y;
-
-			/*Vector3 pos = matrix.MultiplyPoint(keyframePosition);
-			pos = Handles.FreeMoveHandle(pos, Quaternion.identity, .02f, Vector3.zero, Handles.DotHandleCap);
-
-			//tangents:
-			Vector3 t1Direction = new Vector3(Mathf.Sin(keyframe.inTangent), Mathf.Cos(keyframe.inTangent), 0);
-			Vector3 t1 = t1Direction / 3f;
-			Handles.color = Color.green;
-			t1 = Handles.FreeMoveHandle(t1 + pos, Quaternion.identity, 0.015f, Vector3.zero, Handles.DotHandleCap) - pos;
-			Handles.color = Color.white;*/
 		}
 
 		void KeyframeContextMenu()
