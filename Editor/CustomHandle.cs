@@ -31,9 +31,17 @@ namespace BetterHandles
 		
 		public void SetTransform(CustomHandle handle)
 		{
-			this.rotation = handle.rotation;
-			this.position = handle.position;
-			this.scale = handle.scale;
+			this.rotation = Quaternion.LookRotation(
+				handle.matrix.GetColumn(2),
+     			handle.matrix.GetColumn(1)
+			);
+			this.position = handle.matrix.GetColumn(3);
+			this.scale = new Vector3(
+				handle.matrix.GetColumn(0).magnitude,
+				handle.matrix.GetColumn(1).magnitude,
+				handle.matrix.GetColumn(2).magnitude
+			);
+
 			matrix = Matrix4x4.TRS(position, rotation, scale);
 		}
 	}

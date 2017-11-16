@@ -108,8 +108,6 @@ namespace BetterHandles
 
 		bool	GetMousePositionInWorld(out Vector3 position)
 		{
-			Camera cam = Camera.current;
-
 			Ray r = HandleUtility.GUIPointToWorldRay(e.mousePosition);
 			return CustomHandleUtility.GetPointOnPlane(matrix, r, out position);
 		}

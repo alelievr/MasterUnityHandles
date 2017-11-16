@@ -13,10 +13,14 @@ namespace BetterHandles
 		public float		tangentHandleSpacing = .3f;
 		public float		tangentHandleScale = .75f;
 
-		const float			piOf2 = (Mathf.PI / 2f);
-
 		Free2DMoveHandle	pointHandle = new Free2DMoveHandle();
 		Free2DMoveHandle	tangentHandle = new Free2DMoveHandle();
+
+		public enum TangentDirection
+		{
+			In,
+			Out,
+		}
 
 		public void DrawHandle(Vector2 zone, ref Keyframe keyframe, float size)
 		{
@@ -25,7 +29,7 @@ namespace BetterHandles
 				case EventType.MouseDown:
 					//we add the context menu when right clicking on the point Handle:
 					if (HandleUtility.nearestControl == pointHandle.controlId && e.button == 1)
-						KeyframeContextMenu();
+						KeyframeContextMenu(keyframe);
 					break ;
 			}
 
@@ -35,12 +39,17 @@ namespace BetterHandles
 		Vector2 TangentToDirection(float radTangent)
 		{
 			if (float.IsInfinity(radTangent))
-				return new Vector2(0, -1);
+				return new Vector2(0, -tangentHandleSpacing);
 			return (new Vector2(1f, radTangent)).normalized * tangentHandleSpacing;
 		}
 
-		float DirectionToTangent(Vector2 direction)
+		float DirectionToTangent(Vector2 direction, TangentDirection tangentDirection)
 		{
+			if (tangentDirection == TangentDirection.In && direction.x > 0.0001f)
+				return float.PositiveInfinity;
+			if (tangentDirection == TangentDirection.Out && direction.x < -0.0001f)
+				return float.PositiveInfinity;
+	
 			return direction.y / direction.x;
 		}
 
@@ -53,8 +62,8 @@ namespace BetterHandles
 			Vector2 keyframePosition = new Vector2(zone.x * keyframe.time, zone.y * keyframe.value);
 
 			//tangent positions:
-			Vector2 tangent1Position = TangentToDirection(keyframe.inTangent);
-			Vector2 tangent2Position = TangentToDirection(keyframe.outTangent);
+			Vector2 inTangentPosition = -TangentToDirection(keyframe.inTangent);
+			Vector2 outTangentPosition = TangentToDirection(keyframe.outTangent);
 
 			//tangent Wires:
 			HandlesMaterials.vertexColor.SetPass(0);
@@ -62,9 +71,9 @@ namespace BetterHandles
 			{
 				GL.Color(wireColor);
 				GL.Vertex(matrix.MultiplyPoint(keyframePosition));
-				GL.Vertex(matrix.MultiplyPoint(tangent1Position + keyframePosition));
+				GL.Vertex(matrix.MultiplyPoint(inTangentPosition + keyframePosition));
 				GL.Vertex(matrix.MultiplyPoint(keyframePosition));
-				GL.Vertex(matrix.MultiplyPoint(tangent2Position + keyframePosition));
+				GL.Vertex(matrix.MultiplyPoint(outTangentPosition + keyframePosition));
 			}
 			GL.End();
 			
@@ -72,42 +81,31 @@ namespace BetterHandles
 			pointHandle.DrawHandle(ref keyframePosition, size);
 
 			//draw tangents Handles
-			tangent1Position += keyframePosition;
-			tangent2Position += keyframePosition;
-			tangentHandle.DrawHandle(ref tangent1Position, size * tangentHandleScale);
-			tangentHandle.DrawHandle(ref tangent2Position, size * tangentHandleScale);
+			inTangentPosition += keyframePosition;
+			outTangentPosition += keyframePosition;
+			tangentHandle.DrawHandle(ref inTangentPosition, size * tangentHandleScale);
+			tangentHandle.DrawHandle(ref outTangentPosition, size * tangentHandleScale);
 
-			Vector2 d1 = tangent1Position - keyframePosition;
-			Vector2 d2 = tangent2Position - keyframePosition;
+			Vector2 d1 = inTangentPosition - keyframePosition;
+			Vector2 d2 = outTangentPosition - keyframePosition;
 
-			/*if (d1.x < -0.0001f)
-				keyframe.inTangent = d1.y / d1.x;
-			else
-				keyframe.inTangent = float.PositiveInfinity;
-
-			if (d2.x > 0.0001f)
-				keyframe.outTangent = d2.y / d2.x;
-			else
-				keyframe.outTangent = float.PositiveInfinity;*/
-
-			keyframe.inTangent = DirectionToTangent(tangent1Position - keyframePosition);
-			keyframe.outTangent = DirectionToTangent(tangent2Position - keyframePosition);
-
-			Handles.Label(tangent1Position, (DirectionToTangent(tangent1Position - keyframePosition)) + "");
-			Handles.Label(tangent2Position, (DirectionToTangent(tangent2Position - keyframePosition)) + "");
-
-			//set modified keyframe values
-			// keyframe.inTangent = DirectionToRadiant(tangent1Position - keyframePosition) + piOf2;
-			// keyframe.outTangent = DirectionToRadiant(tangent2Position - keyframePosition) - piOf2;
+			//set back keyframe values
+			keyframe.inTangent = DirectionToTangent(inTangentPosition - keyframePosition, TangentDirection.In);
+			keyframe.outTangent = DirectionToTangent(outTangentPosition - keyframePosition, TangentDirection.Out);
 			keyframe.time = keyframePosition.x / zone.x;
 			keyframe.value = keyframePosition.y / zone.y;
 		}
 
-		void KeyframeContextMenu()
+		void KeyframeContextMenu(Keyframe keyframe)
 		{
 			GenericMenu	menu = new GenericMenu();
 
-			menu.AddItem(new GUIContent("test"), false, () => Debug.Log("olol"));
+			//TODO: generic menu with keyframe tangent mode
+
+			// AnimationUtility.SetKeyLeftTangentMode
+			//AnimationUtility.SetKeyBroken
+
+			menu.AddItem(new GUIContent("TODO"), false, () => Debug.Log("olol"));
 			menu.ShowAsContext();
 		}
 	}

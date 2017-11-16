@@ -18,6 +18,8 @@ public class HandlesExampleWindow : EditorWindow
 	static Vector3			boxSize = new Vector3(2, 1, 2);
 	static Vector3			minAngles = new Vector3(0, 0, 0), maxAngles = new Vector3(45, 45, 45);
 	static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1), new Keyframe(.5f, .7f), new Keyframe(1, 0));
+	static Keyframe			keyframe = new Keyframe(0, 0);
+	static Vector2			pos;
 	// static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1));
 
 	Dictionary< string, Action >	handlesActions = new Dictionary< string, Action >()
@@ -32,8 +34,8 @@ public class HandlesExampleWindow : EditorWindow
 		{"Solid scaled rectangle", () => HandlesExtended.DrawRectange(Vector3.zero, Quaternion.Euler(90, 0, 90), new Vector3(1, 3, 2), new Color(0, 0, 1, 1f))},
 		{"Solid scaled sphere", () => HandlesExtended.DrawSphere(Vector3.zero, Quaternion.Euler(90, 0, 90), new Vector3(1, 3, 2), new Color(0, 0, 1, .3f))},
 		{"Full custom Handles", null},
-		{"Keyframe Handle", () => HandlesExtended.CurveHandle(3, 2, curve, Quaternion.identity, new Color(1, 0, 0, .3f), new Color(0, 0, 1, .3f))},
-		{"Curve Handle", () => HandlesExtended.CurveHandle(3, 2, curve, Quaternion.identity, new Color(1, 0, 0, .3f), new Color(0, 0, 1, .3f))},
+		{"Keyframe Handle", () => HandlesExtended.KeyframeHandle(3, 2, ref keyframe, Quaternion.Euler(45, 45, 0), Color.white, Color.yellow)},
+		{"Curve Handle", () => HandlesExtended.CurveHandle(3, 2, curve, Quaternion.Euler(45, 90, 0), new Color(1, 0, 0, .3f), new Color(0, 0, 1, .3f))},
 		{"IMGUI Handles", null},
 		{"Arc Handle", () => HandlesExtended.ArcHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref angle, ref radius, new Color(1, 0, 0, .1f), new Color(0, 0, 1, 1f))},
 		{"Box Bounds Handle", () => HandlesExtended.BoxBoundsHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref boxSize, PrimitiveBoundsHandle.Axes.All, new Color(1, 0, 0, 1f), new Color(0, 0, 1, 1f))},
@@ -92,11 +94,6 @@ public class HandlesExampleWindow : EditorWindow
 		EditorGUILayout.BeginVertical(new GUIStyle("box"));
 		{
 			EditorGUILayout.CurveField(curve);
-			for (int i = 0; i < curve.length; i++)
-			{
-				var key = curve.keys[i];
-				Debug.Log("key[" + i + "]: " + key.inTangent + ", " + key.outTangent);
-			}
 		}
 		EditorGUILayout.EndVertical();
 	}

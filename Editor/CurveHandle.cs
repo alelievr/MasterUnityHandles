@@ -11,12 +11,22 @@ namespace BetterHandles
 		public float	width;
 		public float	height;
 
-		public int		curveSamples = 50;
+		public int		curveSamples = 100;
 
 		KeyframeHandle	keyframeHandle = new KeyframeHandle();
+		bool			mouseOverCurveEdge = false;
+		float			mouseCurveEdgeDst;
+		const float		mouseOverEdgeDstThreshold = .05f;
 
-		public void		DrawHandle(AnimationCurve curve, bool editableSize = false)
+		Vector3			currentMouseWorld;
+
+		public void		DrawHandle(AnimationCurve curve)
 		{
+			//Update the mouse world position:
+			Ray r = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+			if (CustomHandleUtility.GetPointOnPlane(matrix, r, out currentMouseWorld))
+				currentMouseWorld = matrix.inverse.MultiplyPoint(currentMouseWorld);
+
 			switch (e.type)
 			{
 				case EventType.Repaint:
@@ -31,8 +41,11 @@ namespace BetterHandles
 			//draw curve handles:
 			DrawCurvePointsHandle(curve);
 		
-			if (editableSize)
-				DrawZoneHandles();
+			if (e.type == EventType.MouseDown && e.button == 0 && mouseOverCurveEdge)
+			{
+				AddCurveKeyframe(curve);
+				e.Use();
+			}
 		}
 
 		void PushGLContext()
@@ -76,6 +89,17 @@ namespace BetterHandles
 			Vector3 topLeft = new Vector3(f0 * width, curve.Evaluate(f0) * height, 0);
 			Vector3 topRight = new Vector3(f1 * width, curve.Evaluate(f1) * height, 0);
 			Vector3 bottomRight = new Vector3(f1 * width, 0, 0);
+
+			//check if the mouse is near frmo the curve edge:
+			float dst = HandleUtility.DistancePointToLineSegment(currentMouseWorld, topLeft, topRight);
+
+			// Handles.SphereHandleCap(0, matrix.MultiplyPoint(topLeft), Quaternion.identity, .1f, EventType.Repaint);
+
+			if (dst < mouseCurveEdgeDst)
+				mouseCurveEdgeDst = dst;
+			
+			if (dst < mouseOverEdgeDstThreshold)
+				mouseOverCurveEdge = true;
 			
 			GL.Color(curveGradient.Evaluate(f0));
 			GL.Vertex(bottomLeft);
@@ -85,9 +109,36 @@ namespace BetterHandles
 			GL.Vertex(bottomRight);
 		}
 
+		void DrawCurveEdge(AnimationCurve curve, float f0, float f1)
+		{
+			Vector3 topLeft = new Vector3(f0 * width, curve.Evaluate(f0) * height, 0);
+			Vector3 topRight = new Vector3(f1 * width, curve.Evaluate(f1) * height, 0);
+			Color c1 = curveGradient.Evaluate(f0);
+			Color c2 = curveGradient.Evaluate(f1);
+
+			c1.a = 1;
+			c2.a = 1;
+			GL.Color(c1);
+			GL.Vertex(topLeft);
+			GL.Color(c2);
+			GL.Vertex(topRight);
+		}
+
 		void DrawLabels()
 		{
 			Handles.Label(Vector3.zero, "0");
+		}
+
+		void AddCurveKeyframe(AnimationCurve curve)
+		{
+			Vector2 point = currentMouseWorld;
+
+			float time = point.x / width;
+			float value = point.y / height;
+
+			Keyframe newKey = new Keyframe(time, value);
+
+			curve.AddKey(newKey);
 		}
 
 		void DrawCurvePointsHandle(AnimationCurve curve)
@@ -109,6 +160,10 @@ namespace BetterHandles
 			if (curveSamples < 0 || curveSamples > 10000)
 				return ;
 			
+			//We use this function to calcul if the mouse is over the curve edge too
+			mouseCurveEdgeDst = 1e20f;
+			mouseOverCurveEdge = false;
+			
 			//draw curve
 			GL.Begin(GL.QUADS);
 			{
@@ -122,11 +177,22 @@ namespace BetterHandles
 				}
 			}
 			GL.End();
-		}
 
-		void DrawZoneHandles()
-		{
-
+			//if mouse is near the curve edge, we draw it
+			if (mouseOverCurveEdge)
+			{
+				GL.Begin(GL.LINES);
+				{
+					for (int i = 0; i < curveSamples; i++)
+					{
+						float f0 = (float)i / (float)curveSamples;
+						float f1 = (float)(i + 1) / (float)curveSamples;
+	
+						DrawCurveEdge(curve, f0, f1);
+					}
+				}
+				GL.End();
+			}
 		}
 
 		public void	SetColors(Color startColor, Color endColor)

@@ -197,20 +197,39 @@ public static class HandlesExtended
 
 	static CurveHandle		curveHandle = new CurveHandle();
 	static KeyframeHandle	keyframeHandle = new KeyframeHandle();
+	static Free2DMoveHandle	free2DMoveHandle = new Free2DMoveHandle();
 
 	public static void CurveHandle(float width, float height, AnimationCurve curve, Quaternion rotation, Color startColor, Color endColor)
 	{
+		curveHandle.matrix = Matrix4x4.TRS(Vector3.zero, rotation, Vector3.one);
 		curveHandle.SetColors(startColor, endColor);
 		curveHandle.Set2DSize(width, height);
 		curveHandle.DrawHandle(curve);
 	}
 
-	public static void KeyframeHandle(float width, float height, ref Keyframe keyframe, Color pointColor, Color tangentColor)
+	public static void KeyframeHandle(float width, float height, ref Keyframe keyframe, Quaternion rotation, Color pointColor, Color tangentColor)
 	{
+		keyframeHandle.matrix = Matrix4x4.TRS(Vector3.zero, rotation, Vector3.one);
 		keyframeHandle.pointColor = pointColor;
 		keyframeHandle.tangentColor = tangentColor;
 
 		keyframeHandle.DrawHandle(new Vector2(width, height), ref keyframe, .03f);
+	}
+
+	public static void Free2DMoveHandle(ref Vector2 position, float size, Quaternion rotation, Color color, Color selectedColor)
+	{
+		free2DMoveHandle.matrix = Matrix4x4.TRS(Vector3.zero, rotation, Vector3.one);
+		free2DMoveHandle.color = color;
+		free2DMoveHandle.selectedColor = selectedColor;
+		free2DMoveHandle.DrawHandle(ref position, size);
+	}
+
+	public static void Free2DMoveHandle(ref Vector2 position, float size, Quaternion rotation, Texture2D texture, Texture2D selectedTexture)
+	{
+		free2DMoveHandle.matrix = Matrix4x4.TRS(Vector3.zero, rotation, Vector3.one);
+		free2DMoveHandle.texture = texture;
+		free2DMoveHandle.selectedTexture = selectedTexture;
+		free2DMoveHandle.DrawHandle(ref position, size);
 	}
 
 	#endregion
