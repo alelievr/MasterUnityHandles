@@ -24,8 +24,13 @@ namespace BetterHandles
 
 		public void DrawHandle(ref Vector2 position, float size)
 		{
-			controlId = EditorGUIUtility.GetControlID(free2DMoveHandleHash, FocusType.Passive);
-			selected = GUIUtility.hotControl == controlId;
+			DrawHandle(EditorGUIUtility.GetControlID(free2DMoveHandleHash, FocusType.Keyboard), ref position, size);
+		}
+
+		public void DrawHandle(int controlId, ref Vector2 position, float size)
+		{
+			this.controlId = controlId;
+			selected = GUIUtility.hotControl == controlId || GUIUtility.keyboardControl == controlId;
 			hovered = HandleUtility.nearestControl == controlId;
 
 			switch (e.type)
@@ -39,11 +44,14 @@ namespace BetterHandles
 					}
 					break ;
 				case EventType.MouseUp:
-					GUIUtility.hotControl = 0;
-					e.Use();
+					if (GUIUtility.hotControl == controlId && (e.button == 0 || e.button == 2))
+					{
+						GUIUtility.hotControl = 0;
+						e.Use();
+					}
 					break ;
 				case EventType.MouseDrag:
-					if (GUIUtility.hotControl == controlId)
+					if (selected)
 						Move2DHandle(ref position);
 					break ;
 				case EventType.Repaint:
@@ -80,8 +88,8 @@ namespace BetterHandles
 				camUp = matrix.MultiplyPoint(Vector3.up) * size;
 			}
 
-			Color c = color;
 			Texture2D t = texture;
+			Color c = (t == null) ? color : Color.white;
 
 			if (selected && selectedTexture == null)
 				c = selectedColor;
@@ -98,9 +106,13 @@ namespace BetterHandles
 			HandlesMaterials.textured.SetPass(0);
 			GL.Begin(GL.QUADS);
 			{
+				GL.TexCoord2(1, 1);
 				GL.Vertex(worldPos + camRight + camUp);
+				GL.TexCoord2(1, 0);
 				GL.Vertex(worldPos + camRight - camUp);
+				GL.TexCoord2(0, 0);
 				GL.Vertex(worldPos - camRight - camUp);
+				GL.TexCoord2(0, 1);
 				GL.Vertex(worldPos - camRight + camUp);
 			}
 			GL.End();
@@ -118,6 +130,9 @@ namespace BetterHandles
 			if (GetMousePositionInWorld(out mouseWorldPos))
 			{
 				Vector3 pointOnPlane = matrix.inverse.MultiplyPoint(mouseWorldPos);
+
+				if (e.delta != Vector2.zero)
+					changed = true;
 
 				position = pointOnPlane;
 			}

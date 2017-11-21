@@ -20,6 +20,9 @@ public class HandlesExampleWindow : EditorWindow
 	static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1), new Keyframe(.5f, .7f), new Keyframe(1, 0));
 	static Keyframe			keyframe = new Keyframe(0, 0);
 	static Vector2			pos;
+	static Vector2			point1, point2;
+
+	static Texture2D		normaltexture, selectedTexture;
 	// static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1));
 
 	Dictionary< string, Action >	handlesActions = new Dictionary< string, Action >()
@@ -34,8 +37,10 @@ public class HandlesExampleWindow : EditorWindow
 		{"Solid scaled rectangle", () => HandlesExtended.DrawRectange(Vector3.zero, Quaternion.Euler(90, 0, 90), new Vector3(1, 3, 2), new Color(0, 0, 1, 1f))},
 		{"Solid scaled sphere", () => HandlesExtended.DrawSphere(Vector3.zero, Quaternion.Euler(90, 0, 90), new Vector3(1, 3, 2), new Color(0, 0, 1, .3f))},
 		{"Full custom Handles", null},
-		{"Keyframe Handle", () => HandlesExtended.KeyframeHandle(3, 2, ref keyframe, Quaternion.Euler(45, 45, 0), Color.white, Color.yellow)},
-		{"Curve Handle", () => HandlesExtended.CurveHandle(3, 2, curve, Quaternion.Euler(45, 90, 0), new Color(1, 0, 0, .3f), new Color(0, 0, 1, .3f))},
+		{"Keyframe Handle", () => HandlesExtended.KeyframeHandle(3, 2, ref keyframe, Vector3.zero, Quaternion.Euler(45, 45, 0), Color.white, Color.yellow)},
+		{"Curve Handle", () => HandlesExtended.CurveHandle(3, 2, curve, Vector3.zero, Quaternion.Euler(45, 90, 0), new Color(1, 0, 0, .3f), new Color(0, 0, 1, .3f))},
+		{"2D Move Handle", () => HandlesExtended.Free2DMoveHandle(ref point1, .1f, Quaternion.Euler(45, 0, 45), new Color(1, 0, 0, .3f), new Color(0, 0, 1, .3f))},
+		{"2D Textured Move Handle", () => HandlesExtended.Free2DMoveHandle(ref point2, .1f, Quaternion.Euler(45, 90, 0), normaltexture , selectedTexture, selectedTexture)},
 		{"IMGUI Handles", null},
 		{"Arc Handle", () => HandlesExtended.ArcHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref angle, ref radius, new Color(1, 0, 0, .1f), new Color(0, 0, 1, 1f))},
 		{"Box Bounds Handle", () => HandlesExtended.BoxBoundsHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref boxSize, PrimitiveBoundsHandle.Axes.All, new Color(1, 0, 0, 1f), new Color(0, 0, 1, 1f))},
@@ -55,6 +60,9 @@ public class HandlesExampleWindow : EditorWindow
 		SceneView.onSceneGUIDelegate += OnSceneGUI;
 		if (currentKey == null || !handlesActions.ContainsKey(currentKey))
 			currentKey = handlesActions.FirstOrDefault(k => k.Value != null).Key;
+		
+		normaltexture = Resources.Load< Texture2D >("normal");
+		selectedTexture = Resources.Load< Texture2D >("selected");
 	}
 
 	void OnGUI()

@@ -13,6 +13,8 @@ namespace BetterHandles
 
 		public int		curveSamples = 100;
 
+		public int		selectedKeyframeIndex { get; private set; }
+
 		KeyframeHandle	keyframeHandle = new KeyframeHandle();
 		bool			mouseOverCurveEdge = false;
 		float			mouseCurveEdgeDst;
@@ -20,7 +22,12 @@ namespace BetterHandles
 
 		Vector3			currentMouseWorld;
 
-		public void		DrawHandle(AnimationCurve curve)
+		public CurveHandle()
+		{
+			selectedKeyframeIndex = -1;
+		}
+
+		public void	DrawHandle(AnimationCurve curve)
 		{
 			//Update the mouse world position:
 			Ray r = HandleUtility.GUIPointToWorldRay(e.mousePosition);
@@ -72,10 +79,9 @@ namespace BetterHandles
 			GL.Begin(GL.LINE_STRIP);
 			{
 				HandlesMaterials.vertexColor.SetPass(0);
-				GL.Color(Color.blue);
+				GL.Color(Color.black);
 				GL.Vertex(bottomLeft);
 				GL.Vertex(bottomRight);
-				GL.Color(Color.red);
 				GL.Vertex(topRight);
 				GL.Vertex(topLeft);
 				GL.Vertex(bottomLeft);
@@ -138,18 +144,26 @@ namespace BetterHandles
 
 			Keyframe newKey = new Keyframe(time, value);
 
-			curve.AddKey(newKey);
+			selectedKeyframeIndex = curve.AddKey(newKey);
 		}
 
 		void DrawCurvePointsHandle(AnimationCurve curve)
 		{
 			keyframeHandle.SetTransform(this);
+			keyframeHandle.SetCurve(curve);
 
 			for (int i = 0; i < curve.length; i++)
 			{
 				Keyframe kf = curve.keys[i];
 
-				keyframeHandle.DrawHandle(new Vector2(width, height), ref kf, .03f);
+				keyframeHandle.DrawHandle(new Vector2(width, height), ref kf, .03f, i != 0, i != curve.length - 1);
+
+				if (selectedKeyframeIndex == i)
+				{
+					EditorGUIUtility.keyboardControl = keyframeHandle.pointHandle.controlId;
+					EditorGUIUtility.hotControl = keyframeHandle.pointHandle.controlId;
+					selectedKeyframeIndex = -1;
+				}
 
 				curve.MoveKey(i, kf);
 			}

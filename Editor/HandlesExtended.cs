@@ -199,17 +199,17 @@ public static class HandlesExtended
 	static KeyframeHandle	keyframeHandle = new KeyframeHandle();
 	static Free2DMoveHandle	free2DMoveHandle = new Free2DMoveHandle();
 
-	public static void CurveHandle(float width, float height, AnimationCurve curve, Quaternion rotation, Color startColor, Color endColor)
+	public static void CurveHandle(float width, float height, AnimationCurve curve, Vector3 position, Quaternion rotation, Color startColor, Color endColor)
 	{
-		curveHandle.matrix = Matrix4x4.TRS(Vector3.zero, rotation, Vector3.one);
+		curveHandle.matrix = Matrix4x4.TRS(position, rotation, Vector3.one);
 		curveHandle.SetColors(startColor, endColor);
 		curveHandle.Set2DSize(width, height);
 		curveHandle.DrawHandle(curve);
 	}
 
-	public static void KeyframeHandle(float width, float height, ref Keyframe keyframe, Quaternion rotation, Color pointColor, Color tangentColor)
+	public static void KeyframeHandle(float width, float height, ref Keyframe keyframe, Vector3 position, Quaternion rotation, Color pointColor, Color tangentColor)
 	{
-		keyframeHandle.matrix = Matrix4x4.TRS(Vector3.zero, rotation, Vector3.one);
+		keyframeHandle.matrix = Matrix4x4.TRS(position, rotation, Vector3.one);
 		keyframeHandle.pointColor = pointColor;
 		keyframeHandle.tangentColor = tangentColor;
 
@@ -221,14 +221,20 @@ public static class HandlesExtended
 		free2DMoveHandle.matrix = Matrix4x4.TRS(Vector3.zero, rotation, Vector3.one);
 		free2DMoveHandle.color = color;
 		free2DMoveHandle.selectedColor = selectedColor;
+		free2DMoveHandle.faceCamera = true;
+		free2DMoveHandle.texture = null;
+		free2DMoveHandle.selectedTexture = null;
+		free2DMoveHandle.hoveredTexture = null;
 		free2DMoveHandle.DrawHandle(ref position, size);
 	}
 
-	public static void Free2DMoveHandle(ref Vector2 position, float size, Quaternion rotation, Texture2D texture, Texture2D selectedTexture)
+	public static void Free2DMoveHandle(ref Vector2 position, float size, Quaternion rotation, Texture2D texture = null, Texture2D selectedTexture = null, Texture2D hoverTexture = null)
 	{
 		free2DMoveHandle.matrix = Matrix4x4.TRS(Vector3.zero, rotation, Vector3.one);
 		free2DMoveHandle.texture = texture;
 		free2DMoveHandle.selectedTexture = selectedTexture;
+		free2DMoveHandle.hoveredTexture = hoverTexture;
+		free2DMoveHandle.faceCamera = false;
 		free2DMoveHandle.DrawHandle(ref position, size);
 	}
 
