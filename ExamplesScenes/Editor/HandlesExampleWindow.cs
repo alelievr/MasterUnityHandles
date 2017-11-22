@@ -25,6 +25,8 @@ public class HandlesExampleWindow : EditorWindow
 	static Texture2D		normaltexture, selectedTexture;
 	// static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1));
 
+	static DrawPerformances	perfsTest = new DrawPerformances();
+
 	Dictionary< string, Action >	handlesActions = new Dictionary< string, Action >()
 	{
 		{"Simple custom Handles (using existing Handles)", null},
@@ -47,6 +49,8 @@ public class HandlesExampleWindow : EditorWindow
 		{"Capsule Bounds Handle", () => HandlesExtended.CapsuleBoundsHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref height, ref capsRadius)},
 		{"Joint Angular Limit Handle", () => HandlesExtended.JointAngularLimitHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref minAngles, ref maxAngles)},
 		{"Sphere Bounds Handle", () => HandlesExtended.SphereBoundsHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref radius)},
+		{"Performances", null},
+		{"Perfs ('Mesh draw' and 'GL draw' in profiler)", () => perfsTest.Test()},
 	};
 
 	[MenuItem("Window/Handles Examples")]
@@ -63,6 +67,8 @@ public class HandlesExampleWindow : EditorWindow
 		
 		normaltexture = Resources.Load< Texture2D >("normal");
 		selectedTexture = Resources.Load< Texture2D >("selected");
+
+		perfsTest.Init();
 	}
 
 	void OnGUI()

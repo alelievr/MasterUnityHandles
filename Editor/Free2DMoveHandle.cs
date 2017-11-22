@@ -60,13 +60,9 @@ namespace BetterHandles
 				case EventType.Layout:
 					if (e.type == EventType.Layout)
 						SceneView.RepaintAll();
-					Vector3 mouseWorldPos;
 					Vector3 pointWorldPos = matrix * position;
-					if (GetMousePositionInWorld(out mouseWorldPos))
-					{
-						distance = HandleUtility.DistanceToRectangle(pointWorldPos, Camera.current.transform.rotation, size);
-						HandleUtility.AddControl(controlId, distance);
-					}
+					distance = HandleUtility.DistanceToRectangle(pointWorldPos, Camera.current.transform.rotation, size);
+					HandleUtility.AddControl(controlId, distance);
 					break ;
 			}
 		}
