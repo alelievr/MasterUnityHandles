@@ -3,7 +3,7 @@ Unity custom handles examples
 
 ### Curve Handle
 A Handle for [AnmationCurve](https://docs.unity3d.com/ScriptReference/AnimationCurve.html)\
-![](https://image.noelshack.com/fichiers/2017/47/4/1511474448-curve.gif)
+![](https://image.noelshack.com/fichiers/2017/47/4/1511475029-ezgif-com-optimize.gif)
 ![](https://image.noelshack.com/fichiers/2017/47/4/1511467440-screen-shot-2017-11-23-at-9-03-20-pm.png)\
 ![](https://image.noelshack.com/fichiers/2017/47/4/1511469894-r2.png)\
 
