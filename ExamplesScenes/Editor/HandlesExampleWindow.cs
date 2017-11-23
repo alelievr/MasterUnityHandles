@@ -57,6 +57,8 @@ public class HandlesExampleWindow : EditorWindow
 		{"Cylinder cap function", () => position = Handles.FreeMoveHandle(position, Quaternion.identity, 1f, Vector3.zero, CylinderHandleCap)}
 	};
 
+	Vector2 scrollbar;
+
 	[MenuItem("Window/Handles Examples")]
 	public static void ShowWindow()
 	{
@@ -79,6 +81,7 @@ public class HandlesExampleWindow : EditorWindow
 
 	void OnGUI()
 	{
+		scrollbar = EditorGUILayout.BeginScrollView(scrollbar);
 		if (GUILayout.Button("Focus preview"))
 		{
 			focus = true;
@@ -118,6 +121,8 @@ public class HandlesExampleWindow : EditorWindow
 			EditorGUILayout.CurveField(curve);
 		}
 		EditorGUILayout.EndVertical();
+		
+		EditorGUILayout.EndScrollView();
 	}
 
 	void OnSceneGUI(SceneView sv)

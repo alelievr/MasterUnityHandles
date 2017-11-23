@@ -31,13 +31,11 @@ namespace BetterHandles
 
 		public void DrawHandle(Vector2 zone, ref Keyframe keyframe, float size, bool rightEditable = true, bool leftEditable = true)
 		{
-			switch (e.type)
+			if (e.type == EventType.MouseDown)
 			{
-				case EventType.MouseDown:
-					//we add the context menu when right clicking on the point Handle:
-					if (HandleUtility.nearestControl == pointHandle.controlId && e.button == 1)
-						KeyframeContextMenu(keyframe);
-					break ;
+				//we add the context menu when right clicking on the point Handle:
+				if (HandleUtility.nearestControl == pointHandle.controlId && e.button == 1)
+					KeyframeContextMenu(keyframe);
 			}
 
 			DrawKeyframeHandle(zone, ref keyframe, size, rightEditable, leftEditable);
