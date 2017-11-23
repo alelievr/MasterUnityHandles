@@ -213,7 +213,7 @@ public static class HandlesExtended
 		keyframeHandle.pointColor = pointColor;
 		keyframeHandle.tangentColor = tangentColor;
 
-		keyframeHandle.DrawHandle(new Vector2(width, height), ref keyframe, .03f);
+		keyframe = keyframeHandle.DrawHandle(new Vector2(width, height), keyframe, .03f);
 	}
 
 	public static void Free2DMoveHandle(ref Vector2 position, float size, Quaternion rotation, Color color, Color selectedColor)
@@ -225,7 +225,7 @@ public static class HandlesExtended
 		free2DMoveHandle.texture = null;
 		free2DMoveHandle.selectedTexture = null;
 		free2DMoveHandle.hoveredTexture = null;
-		free2DMoveHandle.DrawHandle(ref position, size);
+		position = free2DMoveHandle.DrawHandle(position, size);
 	}
 
 	public static void Free2DMoveHandle(ref Vector2 position, float size, Quaternion rotation, Texture2D texture = null, Texture2D selectedTexture = null, Texture2D hoverTexture = null)
@@ -235,7 +235,7 @@ public static class HandlesExtended
 		free2DMoveHandle.selectedTexture = selectedTexture;
 		free2DMoveHandle.hoveredTexture = hoverTexture;
 		free2DMoveHandle.faceCamera = false;
-		free2DMoveHandle.DrawHandle(ref position, size);
+		position = free2DMoveHandle.DrawHandle(position, size);
 	}
 
 	#endregion

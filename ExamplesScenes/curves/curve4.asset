@@ -39,8 +39,8 @@ MonoBehaviour:
       outSlope: 1.3680071
       tangentMode: 136
     - serializedVersion: 2
-      time: 0.7383972
-      value: 0.16735776
+      time: 0.787725
+      value: 0.15342547
       inSlope: -0.1427853
       outSlope: -0.14278518
       tangentMode: 0
@@ -52,7 +52,7 @@ MonoBehaviour:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
   curveGradient:
     serializedVersion: 2
     key0: {r: 0, g: 0, b: 0, a: 1}

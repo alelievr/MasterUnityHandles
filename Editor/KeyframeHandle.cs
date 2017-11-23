@@ -29,7 +29,7 @@ namespace BetterHandles
 			Out,
 		}
 
-		public void DrawHandle(Vector2 zone, ref Keyframe keyframe, float size, bool rightEditable = true, bool leftEditable = true)
+		public Keyframe DrawHandle(Vector2 zone, Keyframe keyframe, float size, bool rightEditable = true, bool leftEditable = true)
 		{
 			if (e.type == EventType.MouseDown)
 			{
@@ -38,7 +38,7 @@ namespace BetterHandles
 					KeyframeContextMenu(keyframe);
 			}
 
-			DrawKeyframeHandle(zone, ref keyframe, size, rightEditable, leftEditable);
+			return DrawKeyframeHandle(zone, keyframe, size, rightEditable, leftEditable);
 		}
 
 		public void SetCurve(AnimationCurve curve)
@@ -68,7 +68,7 @@ namespace BetterHandles
 			return (EditorGUIUtility.hotControl == controlId || EditorGUIUtility.keyboardControl == controlId);
 		}
 
-		void DrawKeyframeHandle(Vector2 zone, ref Keyframe keyframe, float size, bool rightEditable, bool leftEditable)
+		Keyframe DrawKeyframeHandle(Vector2 zone, Keyframe keyframe, float size, bool rightEditable, bool leftEditable)
 		{
 			pointHandle.SetTransform(this);
 			tangentHandle.SetTransform(this);
@@ -95,20 +95,20 @@ namespace BetterHandles
 					GL.Color(wireColor);
 					if (rightEditable)
 					{
-						GL.Vertex(matrix.MultiplyPoint(keyframePosition));
-						GL.Vertex(matrix.MultiplyPoint(inTangentPosition + keyframePosition));
+						GL.Vertex(matrix.MultiplyPoint3x4(keyframePosition));
+						GL.Vertex(matrix.MultiplyPoint3x4(inTangentPosition + keyframePosition));
 					}
 					if (leftEditable)
 					{
-						GL.Vertex(matrix.MultiplyPoint(keyframePosition));
-						GL.Vertex(matrix.MultiplyPoint(outTangentPosition + keyframePosition));
+						GL.Vertex(matrix.MultiplyPoint3x4(keyframePosition));
+						GL.Vertex(matrix.MultiplyPoint3x4(outTangentPosition + keyframePosition));
 					}
 				}
 				GL.End();
 			}
 			
 			//draw main point Handle
-			pointHandle.DrawHandle(pointControlId, ref keyframePosition, size);
+			keyframePosition = pointHandle.DrawHandle(pointControlId, keyframePosition, size);
 
 			//draw tangents Handles
 			inTangentPosition += keyframePosition;
@@ -116,18 +116,20 @@ namespace BetterHandles
 
 			if (rightEditable)
 			{
-				tangentHandle.DrawHandle(inTangentControlId, ref inTangentPosition, size * tangentHandleScale);
+				inTangentPosition = tangentHandle.DrawHandle(inTangentControlId, inTangentPosition, size * tangentHandleScale);
 				keyframe.inTangent = DirectionToTangent(inTangentPosition - keyframePosition, TangentDirection.In);
 			}
 			if (leftEditable)
 			{
-				tangentHandle.DrawHandle(outTangentControlId, ref outTangentPosition, size * tangentHandleScale);
+				outTangentPosition = tangentHandle.DrawHandle(outTangentControlId, outTangentPosition, size * tangentHandleScale);
 				keyframe.outTangent = DirectionToTangent(outTangentPosition - keyframePosition, TangentDirection.Out);
 			}
 
 			//set back keyframe values
 			keyframe.time = keyframePosition.x / zone.x;
 			keyframe.value = keyframePosition.y / zone.y;
+
+			return keyframe;
 		}
 
 		void KeyframeContextMenu(Keyframe keyframe)
@@ -136,13 +138,15 @@ namespace BetterHandles
 
 			if (curve != null)
 			{
-				int	keyframeIndex = curve.keys.ToList().FindIndex(k => k.value == keyframe.value && k.time == keyframe.time) - 1;
+				int	keyframeIndex = curve.keys.ToList().FindIndex(k => k.Equal(keyframe)) - 1;
+
 				Action< bool, string, AnimationUtility.TangentMode > SetTangentModeMenu = (right, text, tangentMode) => {
 					menu.AddItem(new GUIContent(text), false, () => {
 						if (right)
 							AnimationUtility.SetKeyRightTangentMode(curve, keyframeIndex, tangentMode);
 						else
 							AnimationUtility.SetKeyLeftTangentMode(curve, keyframeIndex, tangentMode);
+						GUI.changed = true;
 					});
 				};
 				SetTangentModeMenu(false, "Left Tangent/Auto", AnimationUtility.TangentMode.Auto);
@@ -156,7 +160,12 @@ namespace BetterHandles
 				SetTangentModeMenu(true, "Right Tangent/Free", AnimationUtility.TangentMode.Free);
 				SetTangentModeMenu(true, "Right Tangent/Linear", AnimationUtility.TangentMode.Linear);
 
-				menu.AddItem(new GUIContent("remove"), false, () => curve.RemoveKey(keyframeIndex));
+				menu.AddItem(new GUIContent("remove"), false, () => {
+					GUI.changed = true;
+					if (keyframeIndex == -1)
+						keyframeIndex = curve.keys.Length - 1;
+					curve.RemoveKey(keyframeIndex);
+				});
 			}
 			else
 				menu.AddDisabledItem(new GUIContent("Curve not set for keyframe !"));

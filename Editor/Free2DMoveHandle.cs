@@ -22,12 +22,12 @@ namespace BetterHandles
 		bool				hovered = false;
 		bool				selected = false;
 
-		public void DrawHandle(ref Vector2 position, float size)
+		public Vector2 DrawHandle(Vector2 position, float size)
 		{
-			DrawHandle(EditorGUIUtility.GetControlID(free2DMoveHandleHash, FocusType.Keyboard), ref position, size);
+			return DrawHandle(EditorGUIUtility.GetControlID(free2DMoveHandleHash, FocusType.Keyboard), position, size);
 		}
 
-		public void DrawHandle(int controlId, ref Vector2 position, float size)
+		public Vector2 DrawHandle(int controlId, Vector2 position, float size)
 		{
 			this.controlId = controlId;
 			selected = GUIUtility.hotControl == controlId || GUIUtility.keyboardControl == controlId;
@@ -60,16 +60,18 @@ namespace BetterHandles
 				case EventType.Layout:
 					if (e.type == EventType.Layout)
 						SceneView.RepaintAll();
-					Vector3 pointWorldPos = matrix * position;
+					Vector3 pointWorldPos = matrix.MultiplyPoint3x4(position);
 					distance = HandleUtility.DistanceToRectangle(pointWorldPos, Camera.current.transform.rotation, size);
 					HandleUtility.AddControl(controlId, distance);
 					break ;
 			}
+
+			return position;
 		}
 
 		void DrawDot(Vector2 position, float size)
 		{
-			Vector3 worldPos = matrix * position;
+			Vector3 worldPos = matrix.MultiplyPoint3x4(position);
 			Vector3 camRight;
 			Vector3 camUp;
 
@@ -80,8 +82,8 @@ namespace BetterHandles
 			}
 			else
 			{
-				camRight = matrix.MultiplyPoint(Vector3.right) * size;
-				camUp = matrix.MultiplyPoint(Vector3.up) * size;
+				camRight = matrix.MultiplyPoint3x4(Vector3.right) * size;
+				camUp = matrix.MultiplyPoint3x4(Vector3.up) * size;
 			}
 
 			Texture2D t = texture;
@@ -125,7 +127,7 @@ namespace BetterHandles
 			Vector3 mouseWorldPos;
 			if (GetMousePositionInWorld(out mouseWorldPos))
 			{
-				Vector3 pointOnPlane = matrix.inverse.MultiplyPoint(mouseWorldPos);
+				Vector3 pointOnPlane = matrix.inverse.MultiplyPoint3x4(mouseWorldPos);
 
 				if (e.delta != Vector2.zero)
 					GUI.changed = true;

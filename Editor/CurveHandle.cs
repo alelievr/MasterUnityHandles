@@ -27,32 +27,34 @@ namespace BetterHandles
 			selectedKeyframeIndex = -1;
 		}
 
-		public void	DrawHandle(AnimationCurve curve)
+		public AnimationCurve DrawHandle(AnimationCurve curve)
 		{
+			AnimationCurve ret;
+			
 			//Update the mouse world position:
 			Ray r = HandleUtility.GUIPointToWorldRay(e.mousePosition);
 			if (CustomHandleUtility.GetPointOnPlane(matrix, r, out currentMouseWorld))
-				currentMouseWorld = matrix.inverse.MultiplyPoint(currentMouseWorld);
+				currentMouseWorld = matrix.inverse.MultiplyPoint3x4(currentMouseWorld);
 
-			switch (e.type)
+			if (e.type == EventType.Repaint)
 			{
-				case EventType.Repaint:
-					PushGLContext();
-					DrawBorders();
-					DrawCurve(curve);
-					DrawLabels();
-					PopGLContext();
-					break ;
+				PushGLContext();
+				DrawBorders();
+				DrawCurve(curve);
+				DrawLabels(curve);
+				PopGLContext();
 			}
 
 			//draw curve handles:
-			DrawCurvePointsHandle(curve);
+			ret = DrawCurvePointsHandle(curve);
 		
 			if (e.type == EventType.MouseDown && e.button == 0 && mouseOverCurveEdge)
 			{
-				AddCurveKeyframe(curve);
+				ret = AddCurveKeyframe(curve);
 				e.Use();
 			}
+
+			return ret;
 		}
 
 		void PushGLContext()
@@ -99,7 +101,7 @@ namespace BetterHandles
 			//check if the mouse is near frmo the curve edge:
 			float dst = HandleUtility.DistancePointToLineSegment(currentMouseWorld, topLeft, topRight);
 
-			// Handles.SphereHandleCap(0, matrix.MultiplyPoint(topLeft), Quaternion.identity, .1f, EventType.Repaint);
+			// Handles.SphereHandleCap(0, matrix.MultiplyPoint3x4(topLeft), Quaternion.identity, .1f, EventType.Repaint);
 
 			if (dst < mouseCurveEdgeDst)
 				mouseCurveEdgeDst = dst;
@@ -130,13 +132,25 @@ namespace BetterHandles
 			GL.Vertex(topRight);
 		}
 
-		void DrawLabels()
+		void DrawLabels(AnimationCurve curve)
 		{
-			Handles.Label(Vector3.zero, "0");
+			Handles.Label(matrix.MultiplyPoint3x4(Vector3.zero), "0");
+
+			foreach (var key in curve.keys)
+			{
+				//draw key time:
+				Vector3 timePosition = matrix.MultiplyPoint3x4(Vector3.right * key.time * width);
+				Handles.Label(timePosition, key.time.ToString("F2"));
+				
+				//draw key value:
+				Vector3 valuePosition = matrix.MultiplyPoint3x4(Vector3.up * key.value * height + Vector3.left * .1f);
+				Handles.Label(valuePosition, key.value.ToString("F2"));
+			}
 		}
 
-		void AddCurveKeyframe(AnimationCurve curve)
+		AnimationCurve AddCurveKeyframe(AnimationCurve curve)
 		{
+			AnimationCurve ret = new AnimationCurve(curve.keys);
 			Vector2 point = currentMouseWorld;
 
 			float time = point.x / width;
@@ -144,22 +158,29 @@ namespace BetterHandles
 
 			Keyframe newKey = new Keyframe(time, value);
 
-			selectedKeyframeIndex = curve.AddKey(newKey);
+			GUI.changed = true;
+
+			selectedKeyframeIndex = ret.AddKey(newKey);
+
+			return ret;
 		}
 
-		void DrawCurvePointsHandle(AnimationCurve curve)
+		AnimationCurve DrawCurvePointsHandle(AnimationCurve curve)
 		{
+			AnimationCurve ret = curve;
+
 			if (curve == null)
-				return ;
+				return null;
 
 			keyframeHandle.SetTransform(this);
 			keyframeHandle.SetCurve(curve);
 
 			for (int i = 0; i < curve.length; i++)
 			{
-				Keyframe kf = curve.keys[i];
+				Keyframe	keyframe = curve.keys[i];
+				Keyframe	movedKeyframe;
 
-				keyframeHandle.DrawHandle(new Vector2(width, height), ref kf, .03f, i != 0, i != curve.length - 1);
+				movedKeyframe = keyframeHandle.DrawHandle(new Vector2(width, height), keyframe, .03f, i != 0, i != curve.length - 1);
 
 				if (selectedKeyframeIndex == i)
 				{
@@ -168,8 +189,15 @@ namespace BetterHandles
 					selectedKeyframeIndex = -1;
 				}
 
-				curve.MoveKey(i, kf);
+				if (!keyframe.Equal(movedKeyframe))
+				{
+					//we duplicate the curve to return another modified one:
+					ret = new AnimationCurve(curve.keys);
+					ret.MoveKey(i, movedKeyframe);
+				}
 			}
+
+			return ret;
 		}
 
 		void DrawCurve(AnimationCurve curve)

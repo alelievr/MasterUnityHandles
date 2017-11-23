@@ -30,8 +30,6 @@ public class CurveScriptableObjectEditor : Editor
 
 	void OnEnable()
 	{
-		var cso = target as CurveScriptableObject;
-
 		curveHandle = new CurveHandle();
 
 		SceneView.onSceneGUIDelegate += OnSceneGUI;
@@ -50,11 +48,11 @@ public class CurveScriptableObjectEditor : Editor
 		curveHandle.SetColors(cso.curveGradient);
 		curveHandle.curveSamples = cso.sampleCount;
 
-		curveHandle.DrawHandle(cso.curve);
+		AnimationCurve modifiedCurve = curveHandle.DrawHandle(cso.curve);
 		if (GUI.changed)
 		{
 			Undo.RecordObject(target, "Changed curve");
-			GUI.changed = false;
+			cso.curve = modifiedCurve;
 		}
 	}
 

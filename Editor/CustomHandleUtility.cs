@@ -9,7 +9,7 @@ public static class CustomHandleUtility
 	{
 		float	dist;
 		position = Vector3.zero;
-		Plane	p = new Plane(planeTransform * Vector3.forward, planeTransform * Vector3.zero);
+		Plane	p = new Plane(planeTransform * Vector3.forward, planeTransform.MultiplyPoint3x4(position));
 
 		p.Raycast(ray, out dist);
 
