@@ -149,6 +149,9 @@ namespace BetterHandles
 
 		void DrawCurvePointsHandle(AnimationCurve curve)
 		{
+			if (curve == null)
+				return ;
+
 			keyframeHandle.SetTransform(this);
 			keyframeHandle.SetCurve(curve);
 
@@ -220,7 +223,8 @@ namespace BetterHandles
 
 		public void SetColors(Gradient gradient)
 		{
-			curveGradient = gradient;
+			if (gradient != null)
+				curveGradient = gradient;
 		}
 
 		public void Set2DSize(Vector2 size) { Set2DSize(size.x, size.y); }

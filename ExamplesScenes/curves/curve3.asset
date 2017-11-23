@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82246cbcf41424417a209489f3849766, type: 3}
+  m_Name: curve3
+  m_EditorClassIdentifier: 
+  curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0.048531346
+      value: 0.57438064
+      inSlope: 0
+      outSlope: 1.3528966
+      tangentMode: 136
+    - serializedVersion: 2
+      time: 0.34006125
+      value: 0.7504334
+      inSlope: -1.2153289
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.55609125
+      value: 0.35655966
+      inSlope: Infinity
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.7383972
+      value: 0.16735776
+      inSlope: Infinity
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.92874324
+      value: 0.05512948
+      inSlope: Infinity
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  curveGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 0, b: 0, a: 1}
+    key1: {r: 1, g: 0.31436878, b: 0, a: 1}
+    key2: {r: 1, g: 0.9724138, b: 0, a: 0}
+    key3: {r: 1, g: 0.9724138, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 13107
+    ctime2: 65535
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 2
+  curveSize: {x: 5.27, y: 5.74}
+  sampleCount: 500

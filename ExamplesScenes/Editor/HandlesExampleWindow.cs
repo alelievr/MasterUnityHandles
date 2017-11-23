@@ -108,6 +108,8 @@ public class HandlesExampleWindow : EditorWindow
 				}
 				EditorGUILayout.EndHorizontal();
 			}
+			if (GUILayout.Button("Hide"))
+				currentKey = "";
 		}
 		EditorGUILayout.EndVertical();
 
@@ -121,7 +123,7 @@ public class HandlesExampleWindow : EditorWindow
 	void OnSceneGUI(SceneView sv)
 	{
 		//draw the current shown handles
-		if (handlesActions[currentKey] != null)
+		if (handlesActions.ContainsKey(currentKey) && handlesActions[currentKey] != null)
 			handlesActions[currentKey]();
 
 		if (focus)
