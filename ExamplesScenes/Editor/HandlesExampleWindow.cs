@@ -21,9 +21,12 @@ public class HandlesExampleWindow : EditorWindow
 	static Keyframe			keyframe = new Keyframe(0, 0);
 	static Vector2			pos;
 	static Vector2			point1, point2;
+	new static Vector3		position;
 
 	static Texture2D		normaltexture, selectedTexture;
 	// static AnimationCurve	curve = new AnimationCurve(new Keyframe(0, 1));
+
+	static Mesh				cylinderMesh;
 
 	static DrawPerformances	perfsTest = new DrawPerformances();
 
@@ -42,15 +45,16 @@ public class HandlesExampleWindow : EditorWindow
 		{"Keyframe Handle", () => HandlesExtended.KeyframeHandle(3, 2, ref keyframe, Vector3.zero, Quaternion.Euler(45, 45, 0), Color.white, Color.yellow)},
 		{"Curve Handle", () => HandlesExtended.CurveHandle(3, 2, curve, Vector3.zero, Quaternion.Euler(45, 90, 0), new Color(1, 0, 0, .3f), new Color(0, 0, 1, .3f))},
 		{"2D Move Handle", () => HandlesExtended.Free2DMoveHandle(ref point1, .1f, Quaternion.Euler(45, 0, 45), new Color(1, 0, 0, .3f), new Color(0, 0, 1, .3f))},
-		{"2D Textured Move Handle", () => HandlesExtended.Free2DMoveHandle(ref point2, .1f, Quaternion.Euler(45, 90, 0), normaltexture , selectedTexture, selectedTexture)},
+		{"2D Textured Move Handle", () => HandlesExtended.Free2DMoveHandle(ref point2, .1f, Quaternion.identity, normaltexture , selectedTexture, selectedTexture)},
 		{"IMGUI Handles", null},
 		{"Arc Handle", () => HandlesExtended.ArcHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref angle, ref radius, new Color(1, 0, 0, .1f), new Color(0, 0, 1, 1f))},
 		{"Box Bounds Handle", () => HandlesExtended.BoxBoundsHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref boxSize, PrimitiveBoundsHandle.Axes.All, new Color(1, 0, 0, 1f), new Color(0, 0, 1, 1f))},
 		{"Capsule Bounds Handle", () => HandlesExtended.CapsuleBoundsHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref height, ref capsRadius)},
 		{"Joint Angular Limit Handle", () => HandlesExtended.JointAngularLimitHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref minAngles, ref maxAngles)},
 		{"Sphere Bounds Handle", () => HandlesExtended.SphereBoundsHandle(Vector3.zero, Quaternion.identity, Vector3.one, ref radius)},
-		{"Performances", null},
+		{"Others", null},
 		{"Perfs ('Mesh draw' and 'GL draw' in profiler)", () => perfsTest.Test()},
+		{"Cylinder cap function", () => position = Handles.FreeMoveHandle(position, Quaternion.identity, 1f, Vector3.zero, CylinderHandleCap)}
 	};
 
 	[MenuItem("Window/Handles Examples")]
@@ -67,6 +71,8 @@ public class HandlesExampleWindow : EditorWindow
 		
 		normaltexture = Resources.Load< Texture2D >("normal");
 		selectedTexture = Resources.Load< Texture2D >("selected");
+
+		cylinderMesh = Resources.Load< Mesh >("cylinder");
 
 		perfsTest.Init();
 	}
@@ -129,4 +135,31 @@ public class HandlesExampleWindow : EditorWindow
 	{
 		SceneView.onSceneGUIDelegate -= OnSceneGUI;
 	}
+
+	#region Cap functions
+
+	static void CylinderHandleCap(int controlId, Vector3 position, Quaternion rotation, float size, EventType eventType)
+	{
+		if (eventType == EventType.Repaint)
+		{
+			HandlesMaterials.vertexColor.SetPass(0);
+			Graphics.DrawMeshNow(cylinderMesh, position, Quaternion.identity);
+		}
+		else if (eventType == EventType.Layout)
+		{
+			float cylinderHeight = 3.5f;
+			Vector3 startPosition = position + Vector3.up * (cylinderHeight / 2);
+			float distance = 1e20f;
+
+			for (int i = 0; i < 9; i++)
+			{
+				distance = Mathf.Min(distance, HandleUtility.DistanceToCircle(startPosition, size / 2));
+				startPosition -= Vector3.up * cylinderHeight / 8;
+			}
+			
+			HandleUtility.AddControl(controlId, distance);
+		}
+	}
+
+	#endregion
 }

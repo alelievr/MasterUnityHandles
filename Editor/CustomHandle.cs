@@ -10,8 +10,6 @@ namespace BetterHandles
 		Vector3				scale = Vector3.one;
 		Vector3				position;
 
-		public static bool	changed = false;
-
 		public Matrix4x4	matrix = Matrix4x4.identity;
 		public Event		e { get { return Event.current; } }
 

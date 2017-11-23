@@ -69,7 +69,7 @@ namespace BetterHandles
 
 		void DrawDot(Vector2 position, float size)
 		{
-			Vector3 worldPos = matrix.MultiplyPoint(position);
+			Vector3 worldPos = matrix * position;
 			Vector3 camRight;
 			Vector3 camUp;
 
@@ -128,7 +128,7 @@ namespace BetterHandles
 				Vector3 pointOnPlane = matrix.inverse.MultiplyPoint(mouseWorldPos);
 
 				if (e.delta != Vector2.zero)
-					changed = true;
+					GUI.changed = true;
 
 				position = pointOnPlane;
 			}
