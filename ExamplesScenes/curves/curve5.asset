@@ -15,48 +15,42 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 2
-      time: 0.10811076
-      value: 0.37970734
+      time: 0
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.3696164
-      value: 0.43577346
-      inSlope: 0.29955387
-      outSlope: 0.6764322
-      tangentMode: 69
-    - serializedVersion: 2
-      time: 0.5109392
-      value: 0.7216947
-      inSlope: 0.62435913
-      outSlope: 6.1424756
-      tangentMode: 0
-    - serializedVersion: 2
-      time: 0.65798795
-      value: 0.71176225
-      inSlope: -11.750209
-      outSlope: 0.015609167
-      tangentMode: 0
-    - serializedVersion: 2
-      time: 0.6954013
-      value: 0.29160464
-      inSlope: -16.663769
-      outSlope: 12.749136
-      tangentMode: 0
-    - serializedVersion: 2
-      time: 0.985906
-      value: 0.8794566
+      time: 0.27762038
+      value: 0.27083328
       inSlope: -0
-      outSlope: -0
+      outSlope: 1.0454428
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.5002223
+      value: 0.574647
+      inSlope: -0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.70179176
+      value: 0.26791283
+      inSlope: -5.165652
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
   curveGradient:
     serializedVersion: 2
-    key0: {r: 1, g: 0, b: 0, a: 1}
-    key1: {r: 1, g: 0.47586203, b: 0, a: 1}
+    key0: {r: 0.65517235, g: 0, b: 1, a: 1}
+    key1: {r: 0, g: 0.95862055, b: 1, a: 1}
     key2: {r: 0.9862069, g: 1, b: 0, a: 0}
     key3: {r: 0.30057865, g: 0.98990375, b: 0.24399216, a: 0}
     key4: {r: 0, g: 1, b: 0.987113, a: 0}
@@ -64,7 +58,7 @@ MonoBehaviour:
     key6: {r: 0, g: 0.089014046, b: 0.99285173, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 7710
+    ctime1: 65535
     ctime2: 17540
     ctime3: 30262
     ctime4: 40863
@@ -80,7 +74,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_NumColorKeys: 7
+    m_NumColorKeys: 2
     m_NumAlphaKeys: 2
   curveSize: {x: 5, y: 3}
   sampleCount: 500

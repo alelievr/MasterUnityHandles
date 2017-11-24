@@ -75,8 +75,6 @@ public class HandlesExampleWindow : EditorWindow
 	void OnEnable()
 	{
 		SceneView.onSceneGUIDelegate += OnSceneGUI;
-		if (currentKey == null || !handlesActions.ContainsKey(currentKey))
-			currentKey = handlesActions.FirstOrDefault(k => k.Value != null).Key;
 		
 		normaltexture = Resources.Load< Texture2D >("normal");
 		selectedTexture = Resources.Load< Texture2D >("selected");

@@ -101,8 +101,6 @@ namespace BetterHandles
 			//check if the mouse is near frmo the curve edge:
 			float dst = HandleUtility.DistancePointToLineSegment(currentMouseWorld, topLeft, topRight);
 
-			// Handles.SphereHandleCap(0, matrix.MultiplyPoint3x4(topLeft), Quaternion.identity, .1f, EventType.Repaint);
-
 			if (dst < mouseCurveEdgeDst)
 				mouseCurveEdgeDst = dst;
 			
@@ -189,6 +187,7 @@ namespace BetterHandles
 					selectedKeyframeIndex = -1;
 				}
 
+				//it the key have been moved
 				if (!keyframe.Equal(movedKeyframe))
 				{
 					//we duplicate the curve to return another modified one:
