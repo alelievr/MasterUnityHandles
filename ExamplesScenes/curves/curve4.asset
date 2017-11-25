@@ -82,5 +82,5 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  curveSize: {x: 5.27, y: 5.74}
+  curveSize: {x: 5.53, y: 5.74}
   sampleCount: 500

@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: VertexColorMaterial
-  m_Shader: {fileID: 4800000, guid: 6536f73c5833c427abd2b03b801cc3ed, type: 3}
+  m_Name: OverlayColorHandle
+  m_Shader: {fileID: 4800000, guid: 01e9f68f8b863406893a2dc8ee9a4340, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -70,7 +70,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _ZWrite: 0
+    - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.227451, g: 0.4784314, b: 0.972549, a: 0.93}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
