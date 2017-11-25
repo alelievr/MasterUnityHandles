@@ -4,68 +4,66 @@ using UnityEngine;
 using UnityEditor;
 using BetterHandles;
 
-[CustomEditor(typeof(Transform), true)]
-public class SnapHandleEditor : Editor
+[InitializeOnLoad]
+public class SnapHandleEditor
 {
-	const float	snapHandleDistance = 3.5f;
-	const float	snapHandleSize = .15f;
-	const float defaultSnapUnit = .1f;
-	const float shiftSnapUnit = .5f;
-	const float commandSnapUnit = .05f;
+	static float	snapHandleDistance = 3.5f;
+	static float	snapHandleSize = .15f;
+	static float 	shiftSnapUnit = .1f;
+	static float 	commandSnapUnit = .25f;
 
-	Mesh		snapToolMesh;
-	Transform	transform;
-	Material	handleMat;
-	
-	Quaternion	currentRotation;
-	Color		currentColor;
+	static Mesh			snapToolMesh;
+	static Transform	transform;
+	static Material		handleMat;
 
-	Editor		defaultTransformEditor;
+	static Quaternion	currentRotation;
+	static Color		currentColor;
 
-	void OnEnable()
+	static SnapHandleEditor()
 	{
 		snapToolMesh = Resources.Load< Mesh >("snapToolHandle");
-		Debug.Log("target: " + target + ", type: " + target.GetType());
-		transform = target as Transform;
+		SceneView.onSceneGUIDelegate += OnSceneGUI;
 	}
 
-	void OnSceneGUI()
+	static void OnSceneGUI(SceneView sv)
 	{
-		// if (Tools.current != Tool.Move)
-		// 	return ;
+		if (Tools.current != Tool.Move)
+			return ;
+
+		if (Selection.activeGameObject == null)
+			return ;
+
+		transform = Selection.activeGameObject.transform;
 		
 		//x axis
-		DrawAxisHandle(Quaternion.Euler(0, 0, 90), transform.right, Handles.xAxisColor, 0);
+		DrawAxisHandle(Quaternion.Euler(0, 0, 90), transform.right, Handles.xAxisColor);
 		//y axis
-		DrawAxisHandle(Quaternion.Euler(0, 0, 0), transform.up, Handles.yAxisColor, 1);
+		DrawAxisHandle(Quaternion.Euler(0, 0, 0), transform.up, Handles.yAxisColor);
 		//z axis
-		DrawAxisHandle(Quaternion.Euler(90, 0, 0), transform.forward, Handles.zAxisColor, 2);
+		DrawAxisHandle(Quaternion.Euler(90, 0, 0), transform.forward, Handles.zAxisColor);
 	}
 
-	void DrawAxisHandle(Quaternion rotation, Vector3 direction, Color color, int index)
+	static void DrawAxisHandle(Quaternion rotation, Vector3 direction, Color color)
 	{
 		var e = Event.current;
 
-		float snapUnit = (e.shift) ? shiftSnapUnit : (e.command) ? commandSnapUnit : defaultSnapUnit;
+		float snapUnit = 0;
 		float size = HandleUtility.GetHandleSize(transform.position) * snapHandleSize;
 		float dist = size * snapHandleDistance;
+
+		if (EditorGUI.actionKey)
+			snapUnit = (e.shift) ? shiftSnapUnit : commandSnapUnit;
 
 		currentRotation = rotation;
 		currentColor = color;
 
 		Vector3 addPos = direction * dist;
-		Vector3 newPosition = Handles.Slider(transform.position + addPos, direction, size, SnapHandleCap, 0) - addPos;
+		Vector3 newPosition = Handles.Slider(transform.position + addPos, direction, size, SnapHandleCap, snapUnit) - addPos;
 
-		if (newPosition != transform.position)
-		{
-			//handmade snapping selected axis
-			newPosition[index] = Mathf.Round(newPosition[index] / snapUnit) * snapUnit;
-
-			transform.position = newPosition;
-		}
+		transform.position = newPosition;
 	}
 
-	void SnapHandleCap(int controlId, Vector3 position, Quaternion rotation, float size, EventType eventType)
+	static void SnapHandleCap(int controlId, Vector3 position, Quaternion rotation, float size, EventType eventType)
 	{
 		if (eventType == EventType.Repaint)
 		{
@@ -83,15 +81,5 @@ public class SnapHandleEditor : Editor
 			float distance = HandleUtility.DistanceToCircle(position, size);
 			HandleUtility.AddControl(controlId, distance);
 		}
-	}
-
-	public override void OnInspectorGUI()
-	{
-		if (defaultTransformEditor == null)
-			defaultTransformEditor = Editor.CreateEditor(transform);
-		
-		Debug.Log("deafultTransformEditor: " + defaultTransformEditor);
-		if (defaultTransformEditor.GetType() != typeof(SnapHandleEditor))
-				defaultTransformEditor.OnInspectorGUI();
 	}
 }
