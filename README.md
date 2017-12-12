@@ -1,5 +1,6 @@
 # MasterUnityHandles
-Unity custom handles examples
+Unity custom handles examples, more information here: [Mastering UnityEditor Handles
+](https://connect.unity.com/p/mastering-unityeditor-handles)
 
 ### Curve Handle
 A Handle for [AnmationCurve](https://docs.unity3d.com/ScriptReference/AnimationCurve.html)\
